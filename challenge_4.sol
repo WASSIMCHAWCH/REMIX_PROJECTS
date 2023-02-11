@@ -13,29 +13,37 @@ interface IERC20 {
 
 contract collect  {
 
+
+    IERC20 public token ;
+
     uint256 public bidAmount = 10000000000000000000 ;
 
     mapping(uint256 => mapping(address => bool)) public bid; 
     mapping(uint256 =>uint256) public roundPrize ;
     uint256 public round ;
 
-
-
     address [] public participants;
 
     address public winner;
 
     uint256 start = block.timestamp ;
+
+
+
+    constructor (address tokenAddress) payable {
+        token = IERC20(tokenAddress);
+
+    }
     
      
     function participate() payable external {
          //require(block.timestamp - start < 200,"participante full") ;
-         require(IERC20(0xD85A5A00ce1DB01430b86A6Ee10Fd54bDb861a22).balanceOf(msg.sender) >= bidAmount, "wrong bid amount");
+         require(token.balanceOf(msg.sender) >= bidAmount, "wrong bid amount");
          require(!bid[round][msg.sender], "address already in");
 
 
         bid[round][msg.sender] = true;
-        IERC20(0xD85A5A00ce1DB01430b86A6Ee10Fd54bDb861a22).transferFrom(msg.sender,address(this), bidAmount);
+        token.transferFrom(msg.sender,address(this), bidAmount);
         
         participants.push(msg.sender);
         roundPrize[round] = bidAmount ;
@@ -58,15 +66,13 @@ contract collect  {
     }
 
     
-    function claimReward() public  {
+    function claimReward() public payable  {
         require(msg.sender == winner, "not allowed");
         
        // require (block.timestamp - start < 300);
 
-        IERC20(0xD85A5A00ce1DB01430b86A6Ee10Fd54bDb861a22).transferFrom(
-        address(this),
-        winner ,
-        IERC20(0xD85A5A00ce1DB01430b86A6Ee10Fd54bDb861a22).balanceOf(address(this)));
+
+        token.transferFrom(address(this),winner,token.balanceOf(address(this)) - roundPrize[round] );
 
         winner = address(0); 
 
