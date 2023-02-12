@@ -11,6 +11,5 @@ contract Wassim is ERC20("Wassim","WS")  {
                 _mint (msg.sender , 10000000 * (10 ** decimals()));
                 owner = payable(msg.sender) ;
     }
-
 }
 
