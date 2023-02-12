@@ -37,7 +37,7 @@ contract collect  {
     
      
     function participate() payable external {
-         //require(block.timestamp - start < 200,"participante full") ;
+         require(block.timestamp - start < 200,"participante full") ;
          require(token.balanceOf(msg.sender) >= bidAmount, "wrong bid amount");
          require(!bid[round][msg.sender], "address already in");
 
@@ -48,11 +48,10 @@ contract collect  {
         participants.push(msg.sender);
         roundPrize[round] = bidAmount ;
         
-      
     }
 
       function choseWinner( ) external returns(address) {
-         //require(start > 200,"participante not full");
+         require(start > 200,"participante not full");
          require(msg.sender == tx.origin, "only human execution");
 
          uint256 luckyIndex = block.timestamp % participants.length ;
@@ -69,10 +68,10 @@ contract collect  {
     function claimReward() public payable  {
         require(msg.sender == winner, "not allowed");
         
-       // require (block.timestamp - start < 300);
+       require (block.timestamp - start < 300);
 
 
-        token.transferFrom(address(this),winner,token.balanceOf(address(this)) - roundPrize[round] );
+        token.transfer(winner,token.balanceOf(address(this)) - roundPrize[round] );
 
         winner = address(0); 
 
